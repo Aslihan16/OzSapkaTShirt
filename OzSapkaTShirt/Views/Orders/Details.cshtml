@@ -1,0 +1,155 @@
+﻿@model OzSapkaTShirt.Models.Order
+@using System.Diagnostics.Eventing.Reader
+@using System.Globalization
+@using System.ComponentModel
+@using System.Security.Policy;
+
+@{
+    ViewData["Title"] = "Details";
+}
+<h1>Sepetim</h1>
+<script>
+    function UpDateBasket(data) 
+    {
+        var basketCount = 0;
+        var i;
+
+        for (i = 0; i < data.orderProducts.length; i++) {
+            basketCount = basketCount + data.orderProducts[i].quantity;
+        }
+        $("#basketCount").html(basketCount);
+
+    }
+    function GetQuantity(productId)
+    {
+        var itemQuantity=document.getElementById(productId+"-adet");
+        return itemQuantity.value;
+
+    }
+    function AddToBasket(productId, quantity, addReMove) 
+    {
+
+        $.post("@Url.Action("UpDateBasket","OrderProducts")/" + productId + "?quantity=" + quantity + "&addReMove=" + addReMove, UpDateBasket, "json");
+        //id paremetleri slahla yazulır
+    @*$("#basketCount").load("@Url.Action("UpDateBasket","OrderProducts")/" + productId+"?quantity=1&addReMove=true"); önce çağırılan değer sonra o actionve virgül başka controller*@
+    }
+
+
+</script>
+
+
+        @if(Model==null)
+        {
+    
+        <h1>Sepetiniz Boş.</h1>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="pull-right">
+                <a class="btn btn-success" href="/">
+                    Sepete Ürün Ekle
+                </a>
+            </div>
+        </div>
+    </div>
+    <p class="button">
+        @Html.ActionLink("Alışverişe devam et","Index" , "Home")
+    </p>
+}
+else
+{
+    <div class="card">
+    </div>
+    <div class="card-header">
+        <div class="row">
+            <div class="col-sm-5">
+                Ürünler
+            </div>
+            <div class="col-sm-2 text-center">
+                Fiyat
+            </div>
+            <div class="col-sm-2 text-center">
+                Adet
+            </div>
+            <div class="col-sm-2 ">
+                <span class="pull-right">
+                    Toplam
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        @foreach (var item in Model.OrderProducts)
+        {
+            <div class="col-sm-2 text-center">
+                <div class="pull-left">
+                    <button type="button" onclick="AddToBasket(@item.ProductId,GetQuantity(@item.ProductId),false)" class="label label-primary" class="btn btn-light">
+                        <span class="pull-left">
+                            Ürünü Kaldır
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="row row-center">
+                <div class="col-sm-2">
+                    <img class="card-img" src="data:image/png;base64,@Convert.ToBase64String(item.Product.DBImage)" style="width:100px;display:block">
+                    @*<img class="img-product-basket w-75"
+            src="/images/catalog/large_@(item.Product.DBImage.ToString()).jpg" />*@
+                </div>
+                <input type="hidden" name="productId" value="012" />
+                <div class="col-sm-3">@item.Product.Name</div>
+                <div class="col-sm-2 text-center">@item.Price.ToString()</div>
+                <div class="col-sm-2 text-center">
+                    <div class="input-group">
+                        <button type="button" onclick="AddToBasket(@item.ProductId,1,false)" class="btn btn-light">-</button>
+                        <input id="@item.ProductId-adet" type="text" value="@item.Quantity"
+                               class="form-control text-center quantity" />
+                        <button type="button" onclick="AddToBasket(@item.ProductId,1,true)" class="btn btn-light">+</button>
+                    </div>
+                </div>
+                <div class="col-sm-2 text-center">
+                    <div class="pull-right">
+                        <span class="pull-right" subtotal>
+                            @((item.Quantity * item.Price).ToString())
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+
+
+
+        @foreach (var item in Model.OrderProducts)
+        {
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-18">
+                        Total: <span class="pull-right" total>
+                            @Model.OrderProducts.Sum(item => item.Quantity * item.Price).ToString()
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+    
+
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="pull-right">
+                    <a class="btn btn-success" href="/">
+                        Add More Products
+                    </a>
+                    <a class="btn btn-success" asp-route-id="@Model.OrderId" asp-action="Approve" asp-controller="Orders">
+                        Sepeti Onayla
+                    </a>
+                </div>
+            </div>
+        </div>
+</div>
+        <p class="button">
+            @Html.ActionLink("Alışverişe devam et","Index","Home")
+        </p>
+        
+}

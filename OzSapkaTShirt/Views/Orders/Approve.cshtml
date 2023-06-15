@@ -1,0 +1,22 @@
+﻿@model OzSapkaTShirt.Models.Order
+@using System.Diagnostics.Eventing.Reader
+@using System.Globalization
+@using System.ComponentModel
+
+@{
+    ViewData["Title"] = "Approve";
+}
+<h1>Siparişiniz Alınmıştır.</h1>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="pull-right">
+            <a class="btn btn-success" href="/">
+                Alışverişe Devam Et
+            </a>
+        </div>
+    </div>
+</div>
+<p class="button">
+    @Html.ActionLink("Alışverişe devam et","Index" , "Home")
+</p>
